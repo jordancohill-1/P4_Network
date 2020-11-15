@@ -1,0 +1,52 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+
+{% block body %}
+    <script type="text/javascript" src="{% static 'network/posts.js' %}"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+
+    <div class="main" id="posts-view">
+    	<h1>All Posts</h1>
+
+    	<div class= "main border">
+    		<div class="main">
+				<form id="post-form">
+	    			<h3>New Post</h3>
+		    		<textarea class="form-control" id="post-text" placeholder="What's on your mind?..."></textarea>
+	            	<input type="submit"   id="submit-new-post"  {% if user.is_authenticated %} value="Post" class="btn btn-primary" {% else %} disabled value="Login to post" class="btn btn-danger" {%endif%}/>
+
+            	</form>
+        	</div>
+    	</div>
+        <div class="main" id="all-posts"></div>
+
+    </div>
+
+    <div class="main" id="profile-view">
+        <div class="container">
+          <input type="submit" class="btn btn-primary"  id="follow_button" {% if user.is_authenticated %} {% else %} style="display: none;" {%endif%}/>
+
+            <div id="row" class="border row">
+              <div class="col-sm">
+                <label>Followers</label>
+              </div>
+              <div class="col-sm">
+                <div>#</div>
+              </div>
+              <div class="col-sm">
+                <div>Following</div>
+              </div>
+              <div class="col-sm">
+                 <div>#<div>
+              </div>
+
+            </div>
+          </div>
+          <br />
+          <div id="profile-posts"></div>
+    </div>
+{% endblock %}
