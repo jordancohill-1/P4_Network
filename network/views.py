@@ -8,11 +8,16 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Post
+from .models import User, Post, Follow
 
 #helpers
-def currUser(username):
-    return username == request.user.username
+
+def getUser(username):
+    return User.objects.get(username=username)
+
+def currentUser(request):
+    return User.objects.get(id=request.user.id)
+
     
 
 
@@ -96,9 +101,43 @@ def posts(request):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 @csrf_exempt
-def profile(request, username):   
+def profile(request, username):
     posts = Post.objects.filter(user__username=username)
     posts = posts.order_by("-timestamp").all() 
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+    
+
+
+@csrf_exempt
+@login_required
+def follow(request, username):
+
+    follows = Follow.objects.filter(followed__username=username, follower__username=request.user.username)
+
+    if request.method == "GET":
+        return JsonResponse([follow.serialize() for follow in follows], safe=False)
+
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("followed") is not None:
+            if follows.exists():
+                follows.delete();
+                print("if         ")
+            else:
+                print(username + " " + request.user.username)
+                follow = Follow(followed=getUser(username), follower=currentUser(request))
+                follow.save()
+        return HttpResponseRedirect("../profile/" + username)
+
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
+
+
+
+
+
 
 

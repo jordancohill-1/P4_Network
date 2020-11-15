@@ -17,6 +17,16 @@ function view_profile(){
   document.querySelector('#posts-view').style.display = 'none';
 }
 
+/*function get_user(username, value){
+  fetch(`/profile/${username}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+        follow = value
+    })
+  }).catch((error) => {
+        console.log(error);
+  });
+}*/
 
 function all_posts() {
   fetch('/posts')
@@ -33,10 +43,12 @@ function profile_posts(username) {
   fetch(`/profile/${username}`)
     .then(response => response.json())
       .then( posts => {
-        html_for_posts(posts, '#profile-posts');        
-      }).catch((error) => {
+        profile_html(posts, username);   
+      })
+      .catch((error) => {
           console.log(error);
     });
+
 }
 
 
@@ -60,51 +72,94 @@ function create_post() {
 function html_for_posts(posts, doc){
   const view = document.querySelector(doc);
         posts.forEach((post) => {
-        let item = document.createElement('div');
-          item.innerHTML = `
-          <div class="container">
-            <div id="row" class="border row">
-              <div class="col-sm">
-              <a href="">${post.username}</a>
-                <div id="user"></div>
-              </div>
-              <div class="col-sm">
-                <div> ${post.text}</div>
-              </div>
-              <div class="col-sm">
-                <div> post.likes</div>
-              </div>
-              <div class="col-sm" style="text-align:right;">
-                 ${post.timestamp}
-              </div>
+          let item = document.createElement('div');
+            item.innerHTML = `
+            <div class="container">
+              <div id="row" class="border row">
+                <div class="col-sm">
+                <a href="">${post.username}</a>
+                  <div id="user"></div>
+                </div>
+                <div class="col-sm">
+                  <div> ${post.text}</div>
+                </div>
+                <div class="col-sm">
+                  <div> post.likes</div>
+                </div>
+                <div class="col-sm" style="text-align:right;">
+                   ${post.timestamp}
+                </div>
 
+              </div>
             </div>
-          </div>
-          `;
+            `;
           item.addEventListener('click', function() {
-          profile_posts(post.username);
           view_profile();
+          profile_posts(post.username);
+          
         });
             view.append(item);
           });
 
+        
+
 }
 
-function html_follow_button(username){
+function profile_html(posts, username) {
+  fetch(`follow/${username}`)
+  .then(response => response.json())
+    .then( follow => {
+      clear_profile();
+      const view = document.querySelector('#header');
+      let header = document.createElement('H3');
+      header.innerHTML = `${username}`;
+      var is_follower = follow ? 'Follow' : 'Unfollow';
+      let follow_button = document.createElement('Button');
+      follow_button.innerHTML = `${is_follower}`;
+      follow_button.className = `btn btn-sm btn-outline-primary`;
+      follow_button.addEventListener('click', function(){
+          follow_user(username, posts);
+      });
+      view.append(header);
+      view.append(follow_button);
 
-  /*var is_archived = email.archived ? 'Unarchive' : 'Archive';
-  let archive_button = document.createElement('BUTTON');
-      archive_button.innerHTML = `${is_archived}`;
-      archive_button.className = `btn btn-sm btn-outline-danger`;
-      archive_button.addEventListener('click', function() {
-        archive(email);
-        });
-        */
+      const main = document.querySelector('#main');
+      posts.forEach((post) => {
+        let item = document.createElement('div');
+        item.innerHTML = `
+        <div class="border main">
+        <div>${post.text}</div>
+        <div>${post.timestamp}</div>
+        </div>
+        `;
+        main.append(item);
+      });
       
+   }).catch((error) => {
+        console.log(error);
+  });
+
 }
 
 
 
+function follow_user(username, posts){
+  fetch(`follow/${username}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+        followed: username
+    }).then(profile => {
+      profile_html(posts, username)
+    })
+  }).catch((error) => {
+        console.log(error);
+  });
+}
+
+function clear_profile(){
+  document.querySelector('#header').innerHTML = '';
+  document.querySelector('#main').innerHTML = '';
+}
 
 
 

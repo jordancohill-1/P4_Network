@@ -9,6 +9,7 @@ class Post(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
     text = models.TextField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_follower = models.BooleanField(default=False)
 
 
     def serialize(self):
@@ -17,6 +18,7 @@ class Post(models.Model):
             "username": self.user.username,
             "text": self.text,
             "timestamp": self.timestamp.strftime("%b %-d %Y, %-I:%M %p"),
+            "is_follower": self.is_follower
         }
 
 class Follow(models.Model):
@@ -27,8 +29,8 @@ class Follow(models.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "followed": self.user,
-            "follower": self.user,
+            "followed": self.followed.username,
+            "follower": self.follower.username,
             "timestamp": self.timestamp.strftime("%b %-d %Y, %-I:%M %p"),
 
         }

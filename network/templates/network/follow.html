@@ -1,0 +1,5 @@
+{% extends "network/index.html" %}
+{% block body %}
+<input type="submit" class="btn btn-primary"  value="asdfiuasdbf" id="follow_button" {% if user.is_authenticated %}  {% else %} style="display: none;" {%endif%}/>
+
+{% endblock %}
